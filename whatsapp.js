@@ -1,20 +1,115 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // 1. Configura tu número (código de país + número, sin el + ni espacios) y el mensaje
-  const telefono = "573214645550"; 
-  const mensaje = encodeURIComponent("Hola Nativa, me gustaría recibir más información sobre las rutas.");
+  const numero = typeof NATIVA_WHATSAPP !== "undefined" ? NATIVA_WHATSAPP : "57321464550";
 
-  // 2. Crea el enlace con el ícono SVG de WhatsApp
-  const link = document.createElement("a");
-  link.href = `https://wa.me/${telefono}?text=${mensaje}`;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.className = "btn-whatsapp-flotante";
-  link.setAttribute("aria-label", "Contactar por WhatsApp");
-  link.innerHTML = `
-    <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824z"/>
+  // 1. Obtener datos de la página actual
+  const rutaCompleta = window.location.pathname;
+  const archivo = rutaCompleta.substring(rutaCompleta.lastIndexOf("/") + 1).toLowerCase();
+  const pagina = archivo.replace(".html", "");
+  const h1Elemento = document.querySelector("h1");
+  const tituloReal = h1Elemento ? h1Elemento.innerText.trim() : "";
+
+  const formatearSlug = (slug) =>
+    slug.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" ");
+
+  // 2. Rastrear historial de sesión para dar contexto inteligente
+  const paginaAnterior = sessionStorage.getItem("nativa_ultima_pagina") || "";
+  sessionStorage.setItem("nativa_ultima_pagina", tituloReal || pagina || "Inicio");
+
+  // 3. Definir mensaje base y texto del globo llamativo (Tooltip)
+  let mensajeActual = "Hola Nativa, vengo de su sitio web y me gustaría recibir asesoría.";
+  let textoGlobo = "¿Necesitas ayuda? Escríbenos";
+
+  if (pagina === "" || pagina === "index") {
+    mensajeActual = "Hola Nativa, estoy explorando su página principal y quiero conocer sus experiencias.";
+    textoGlobo = "¡Hola! ¿Buscas una ruta o producto?";
+  } else if (pagina.startsWith("aliado-")) {
+    const nombre = tituloReal || formatearSlug(pagina.replace("aliado-", ""));
+    mensajeActual = `Hola Nativa, estoy viendo el perfil de *${nombre}* y me gustaría conectar o reservar.`;
+    textoGlobo = `¿Preguntas sobre ${nombre}?`;
+  } else if (pagina.startsWith("producto-")) {
+    const nombre = tituloReal || formatearSlug(pagina.replace("producto-", ""));
+    mensajeActual = `Hola Nativa, me interesa adquirir *${nombre}*. ¿Me confirman disponibilidad y envío?`;
+    textoGlobo = `¿Quieres pedir ${nombre}?`;
+  } else if (pagina.startsWith("ruta-")) {
+    const nombre = tituloReal || `Ruta ${formatearSlug(pagina.replace("ruta-", ""))}`;
+    mensajeActual = `Hola Nativa, quiero información sobre fechas y cupos para *${nombre}*.`;
+    textoGlobo = `¿Te gustaría vivir esta ruta?`;
+  } else if (pagina === "rutas") {
+    mensajeActual = "Hola Nativa, estoy viendo sus rutas y quiero ayuda para elegir la ideal para mí.";
+    textoGlobo = "¿Te ayudamos a elegir ruta?";
+  } else if (pagina === "directorio") {
+    mensajeActual = "Hola Nativa, estoy explorando el directorio y busco recomendaciones.";
+    textoGlobo = "¿Buscas algún aliado en especial?";
+  }
+
+  if (paginaAnterior && paginaAnterior !== (tituloReal || pagina)) {
+    mensajeActual += ` (Vengo de ver: ${paginaAnterior}).`;
+  }
+
+  // 4. Crear contenedor principal (para botón + globo interactivo)
+  const contenedor = document.createElement("div");
+  contenedor.className = "whatsapp-widget";
+
+  // Globo de mensaje persuasivo
+  const globo = document.createElement("div");
+  globo.className = "whatsapp-tooltip";
+  globo.innerHTML = `<span>${textoGlobo}</span><button type="button" class="wa-close" aria-label="Cerrar mensaje">&times;</button>`;
+
+  // Botón flotante
+  const enlace = document.createElement("a");
+  enlace.target = "_blank";
+  enlace.rel = "noopener noreferrer";
+  enlace.setAttribute("aria-label", "Contactar por WhatsApp");
+  enlace.className = "whatsapp-float";
+  enlace.innerHTML = `
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor">
+      <path d="M16.004 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.256.59 4.46 1.71 6.404L3.2 28.8l6.56-1.72a12.74 12.74 0 0 0 6.244 1.62h.006c7.058 0 12.796-5.74 12.796-12.8 0-3.42-1.332-6.636-3.75-9.054A12.716 12.716 0 0 0 16.004 3.2zm0 23.34h-.004a10.61 10.61 0 0 1-5.41-1.48l-.388-.23-3.892 1.02 1.04-3.794-.252-.4a10.596 10.596 0 0 1-1.626-5.656c0-5.86 4.768-10.628 10.632-10.628 2.84 0 5.508 1.106 7.516 3.114a10.56 10.56 0 0 1 3.112 7.518c0 5.862-4.768 10.636-10.628 10.636z"/>
     </svg>
   `;
 
-  document.body.appendChild(link);
+  // Función global para actualizar el mensaje dinámicamente desde cualquier parte de la web
+  window.actualizarWhatsApp = function (nuevoMensaje, nuevoGlobo) {
+    enlace.href = `https://wa.me{numero}?text=${encodeURIComponent(nuevoMensaje)}`;
+    if (nuevoGlobo) {
+      globo.querySelector("span").textContent = nuevoGlobo;
+      globo.classList.add("visible");
+    }
+  };
+
+  // Inicializar enlace
+  window.actualizarWhatsApp(mensajeActual);
+
+  // 5. Interactividad: Detectar si el usuario hace clic en filtros, categorías o tarjetas
+  document.addEventListener("click", function (e) {
+    const filtro = e.target.closest("[data-filter], .filter-btn, .tab-btn, .categoria-btn");
+    if (filtro) {
+      const nombreFiltro = filtro.innerText.trim();
+      if (nombreFiltro && nombreFiltro.toLowerCase() !== "todos") {
+        window.actualizarWhatsApp(
+          `Hola Nativa, estoy filtrando por *${nombreFiltro}* en ${tituloReal || pagina} y me gustaría asesoría.`,
+          `¿Te ayudo con ${nombreFiltro}?`
+        );
+      }
+    }
+  });
+
+  // Mostrar el globo tras 4 segundos para captar atención sin estorbar al cargar
+  setTimeout(() => {
+    if (!sessionStorage.getItem("wa_globo_cerrado")) {
+      globo.classList.add("visible");
+    }
+  }, 4000);
+
+  // Permitir cerrar el globo si el usuario quiere despejar la pantalla en móvil
+  globo.querySelector(".wa-close").addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    globo.classList.remove("visible");
+    sessionStorage.setItem("wa_globo_cerrado", "true");
+  });
+
+  contenedor.appendChild(globo);
+  contenedor.appendChild(enlace);
+  document.body.appendChild(contenedor);
 });
+
