@@ -3,33 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const telefono = "573214645550"; 
   const mensaje = encodeURIComponent("Hola Nativa, me gustaría recibir más información sobre las rutas.");
 
-  // 2. Crea los estilos del botón (fijo abajo a la derecha)
-  const style = document.createElement("style");
-  style.innerHTML = `
-    .btn-whatsapp-flotante {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 60px;
-      height: 60px;
-      background-color: #25D366;
-      color: #FFF;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      z-index: 9999;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-    .btn-whatsapp-flotante:hover {
-      transform: scale(1.08);
-      background-color: #20ba5a;
-    }
-  `;
-  document.head.appendChild(style);
-
-  // 3. Crea el enlace con el ícono SVG de WhatsApp
+  // 2. Crea el enlace con el ícono SVG de WhatsApp
   const link = document.createElement("a");
   link.href = `https://wa.me/${telefono}?text=${mensaje}`;
   link.target = "_blank";
