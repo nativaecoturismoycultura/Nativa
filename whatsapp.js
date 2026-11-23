@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   // 1. Configura tu número (código de país + número, sin el + ni espacios) y el mensaje
-  const telefono = "573001234567"; 
+  const telefono = "573214645550"; 
   const mensaje = encodeURIComponent("Hola Nativa, me gustaría recibir más información sobre las rutas.");
 
   // 2. Crea los estilos del botón (fijo abajo a la derecha)
