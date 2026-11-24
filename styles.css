@@ -1072,19 +1072,20 @@ section {
         color: #666;
     }
 }
-/* Contenedor fijo blindado para escritorio y móvil */
+/* =========================================
+   WIDGET FLOTANTE DE WHATSAPP (RESPONSIVO)
+   ========================================= */
 .whatsapp-widget {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 99999; /* Asegura que esté por encima de cualquier menú o banner */
+  z-index: 99999;
   display: flex;
   align-items: center;
   gap: 12px;
-  pointer-events: none; /* Evita bloquear clics en áreas transparentes */
+  pointer-events: none;
 }
 
-/* Botón circular */
 .whatsapp-float {
   pointer-events: auto;
   width: 58px;
@@ -1106,7 +1107,6 @@ section {
   background-color: #1ebe5d;
 }
 
-/* Globo de mensaje interactivo */
 .whatsapp-tooltip {
   pointer-events: auto;
   background-color: #ffffff;
@@ -1142,7 +1142,7 @@ section {
   padding: 0 2px;
 }
 
-/* Ajustes específicos para pantallas móviles */
+/* Responsivo para celulares y tablets */
 @media (max-width: 768px) {
   .whatsapp-widget {
     bottom: 16px;
@@ -1158,6 +1158,7 @@ section {
   .whatsapp-tooltip {
     font-size: 12.5px;
     padding: 8px 10px;
-    max-width: 185px; /* Evita que el globo se salga del borde izquierdo en celulares pequeños */
+    max-width: 185px;
   }
 }
+
