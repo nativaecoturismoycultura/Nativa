@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const numero = typeof NATIVA_WHATSAPP !== "undefined" ? NATIVA_WHATSAPP : "57321464550";
+  const numero =
+    window.NATIVA_CONFIG && window.NATIVA_CONFIG.NATIVA_WHATSAPP
+      ? window.NATIVA_CONFIG.NATIVA_WHATSAPP
+      : "573214645550";
 
   // 1. Obtener datos de la página actual
   const rutaCompleta = window.location.pathname;
