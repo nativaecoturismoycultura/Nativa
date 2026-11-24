@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Función global para actualizar el mensaje dinámicamente desde cualquier parte de la web
   window.actualizarWhatsApp = function (nuevoMensaje, nuevoGlobo) {
-    enlace.href = `https://wa.me{numero}?text=${encodeURIComponent(nuevoMensaje)}`;
+    enlace.href = `https://wa.me/${numero}?text=${encodeURIComponent(nuevoMensaje)}`;
     if (nuevoGlobo) {
       globo.querySelector("span").textContent = nuevoGlobo;
       globo.classList.add("visible");
